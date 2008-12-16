@@ -1,0 +1,94 @@
+#!/bin/ksh
+
+set -x
+
+export  DEST=/data/cmdax8/afsd/hmd/ssm
+export DEPOT=/data/cmdax8/afsd/hmd/ssm
+export PKG_NAME=burplib-c
+#export  DEST=/home/cmss/afsm/adm/ssm_access_points/cmda
+#export DEPOT=/home/cmss/afsm/adm/ssm_access_points/cmda_repository
+export VERNO="1.1"
+export BINAIRE_VERNO="$PKG_NAME-$VERNO"
+export BINAIRE_UPDATE="27-11-2006"
+export BINAIRE_SSMVER="${PKG_NAME}_$VERNO"
+
+mtype=`uname -s`
+case  $mtype  in
+IRIX64 ) export HOSTTYPE=irix65-mips-n32 ;;
+AIX    ) export HOSTTYPE=aix51-ppc-64 ;;
+Linux  ) rel=`cat /proc/version | awk '{split($3,a,"."); b=a[1]a[2]; print b; }'`;
+         export HOSTTYPE=linux$rel-i386 ;;
+esac
+export OS=$HOSTTYPE
+
+PKGDIR=./package/${BINAIRE_VERNO}
+if [ -d ${PKGDIR} ]; 
+then
+	rm -rf ${PKGDIR}
+fi
+
+if [ ! -d ${PKGDIR} ]; 
+then
+	mkdir -p ${PKGDIR}
+	mkdir -p ${PKGDIR}/lib
+	mkdir -p ${PKGDIR}/include
+fi
+
+if [ ! -d etc ]; 
+then
+	mkdir -p etc/profile.d
+fi
+if [ ! -d .ssm.d ]; 
+then
+	mkdir -p .ssm.d
+fi
+
+# compiler le package en appellant compile.sh
+./compile.sh
+
+cp   ssmtempo/lib/* ${PKGDIR}/lib
+cp   ssmtempo/include/* ${PKGDIR}/include
+
+rm -rf ${PKGDIR}/lib/CVS
+rm -rf ${PKGDIR}/include/CVS
+
+cp -r ./etc ${PKGDIR};
+rm -rf ${PKGDIR}/etc/CVS
+rm -rf ${PKGDIR}/etc/profile.d/CVS
+rm -rf .ssm.d/control
+cp -r .ssm.d ${PKGDIR};
+rm -rf ${PKGDIR}/.ssm.d/CVS
+
+cat >> ${PKGDIR}/.ssm.d/control << EOF
+Package: $PKG_NAME
+Version: ${VERNO}
+Platform: ${HOSTTYPE}
+Maintainer: ${USER}
+BuildInfo: ${BINAIRE_UPDATE}
+Description: C/C++ Burp API
+EOF
+
+
+cd package
+#
+# tar
+#
+ UDS="_"
+ BINAIRE_FN=${BINAIRE_SSMVER}${UDS}${OS}
+ mv $BINAIRE_VERNO $BINAIRE_FN
+ tar -cvf $BINAIRE_FN.tar $BINAIRE_FN
+ gzip $BINAIRE_FN.tar
+ mv $BINAIRE_FN.tar.gz $BINAIRE_FN.ssm
+ echo "Removing: $BINAIRE_FN"
+ rm -rf ./$BINAIRE_FN
+
+# install software
+echo "package = $BINAIRE_FN"
+#ssm unpublish -d $DEST  -p $BINAIRE_FN --force --yes
+ssm uninstall -d $DEST  -p $BINAIRE_FN --force --yes
+ssm install -d $DEST -u `pwd` -p $BINAIRE_FN   --force --yes
+#ssm publish -d $DEST          -p $BINAIRE_FN   --force --yes
+
+# keep a copy in repository
+cp -rf  $BINAIRE_FN.ssm $DEPOT
+#rm -rf  $DEPOT/$BINAIRE_FN.ssm
