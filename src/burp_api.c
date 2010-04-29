@@ -411,6 +411,7 @@ void  brp_freeblk( BURP_BLK *blk )
     free(blk->drval);
     blk->drval = NULL;
   }
+  free( blk );
 }
 
 /*
@@ -769,6 +770,7 @@ BURP_BLK *brp_newblk (void)
      blk->tblval = NULL;
      blk->rval = NULL;
      blk->max_len = 0;
+     blk->store_type = STORE_FLOAT;
 
      blk->drval = NULL;
      brp_resetblkhdr( blk );
