@@ -6,13 +6,13 @@
  *
  *  revision  :  Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
  *  object    :  THIS FILE CONTAINS THE IMPLEMENTATION
  *               OF THE BURP APPLICATION PROGRAMMING INTERFACE WRAPPER
- *               THIS IS DESIGNED TO MAKE LIFE EASIER AND REMOVE THE BURDEN OF 
+ *               THIS IS DESIGNED TO MAKE LIFE EASIER AND REMOVE THE BURDEN OF
  *               CALLING BURP SUBROUTINES DIRECTLY.
  *               NOT ALL ARE COVERED, ONLY THOSE THAT ARE MOSTLY USED ARE WRAPPED
  *
@@ -26,6 +26,7 @@
 #include <sys/time.h>
 #include <syslog.h>
 #include <errno.h>
+#include <rmnlib.h>
 #include "burp_api.h"
 
 
@@ -40,7 +41,7 @@ static int brp_getrpthdr( BURP_RPT *rpt );
  *
  *  revision  :  Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -53,7 +54,7 @@ void brp_allocrpt( BURP_RPT *rpt, int  nsize )
 
    if ( rpt == NULL )
    {
-      fprintf(stderr,"rpt  pointer is NULL\n"); 
+      fprintf(stderr,"rpt  pointer is NULL\n");
       return ;
    }
 
@@ -76,7 +77,7 @@ void brp_allocrpt( BURP_RPT *rpt, int  nsize )
  *
  *  revision  :  Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -84,9 +85,9 @@ void brp_allocrpt( BURP_RPT *rpt, int  nsize )
  */
 void brp_allocblk( BURP_BLK *blk, int  nele, int nval, int nt )
 {
-	int  len ; 
-	int  i   ; 
-	if (blk == NULL) return;
+        int  len ;
+        int  i   ;
+        if (blk == NULL) return;
         if (nele * nval * nt == 0 )
         {
             fprintf(stderr,"allooblk: une des dimensions du block est nulle!!\n");
@@ -96,31 +97,31 @@ void brp_allocblk( BURP_BLK *blk, int  nele, int nval, int nt )
  * reallocation dynamique de la memoire pour s'ajuster
  * a la dimension requis
  */
-	BLK_SetNELE(blk, nele );
-	BLK_SetNVAL(blk, nval );
-	BLK_SetNT(blk, nt );
+        BLK_SetNELE(blk, nele );
+        BLK_SetNVAL(blk, nval );
+        BLK_SetNT(blk, nt );
 
-	len = nele * nval * nt;
-	if (blk->max_nele < nele) {
-		blk->max_nele = nele;
-		if (blk->lstele != NULL) free( blk->lstele );
-		blk->lstele = (int *) malloc( nele * sizeof(int) );
+        len = nele * nval * nt;
+        if (blk->max_nele < nele) {
+                blk->max_nele = nele;
+                if (blk->lstele != NULL) free( blk->lstele );
+                blk->lstele = (int *) malloc( nele * sizeof(int) );
                 for (i = 0; i != nele;++i)
                     (blk->lstele)[i] = 0;
-		if (blk->dlstele != NULL) free( blk->dlstele );
-		blk->dlstele = (int *) malloc( nele * sizeof(int) );
+                if (blk->dlstele != NULL) free( blk->dlstele );
+                blk->dlstele = (int *) malloc( nele * sizeof(int) );
                 for (i = 0; i != nele;++i)
                     (blk->dlstele)[i] = 0;
-	}
+        }
 
-	if (len <= blk->max_len) {
-		nval = blk->max_len / (nele * nt);
-		blk->max_nval = nval;
-		blk->max_nt = nt;
-		return;
-	}
-	blk->max_nval = nval;
-	blk->max_nt = nt;
+        if (len <= blk->max_len) {
+                nval = blk->max_len / (nele * nt);
+                blk->max_nval = nval;
+                blk->max_nt = nt;
+                return;
+        }
+        blk->max_nval = nval;
+        blk->max_nt = nt;
 
 /*
 ** tous les tableaux sont lineaires, meme les tableau a plusieurs dimensions
@@ -128,8 +129,8 @@ void brp_allocblk( BURP_BLK *blk, int  nele, int nval, int nt )
 ** aux bons elements selon l'ordre fortran
 ** l'allocation est fait pour tous les types (entier, reel, double)
 */
-	if (blk->tblval != NULL) free( blk->tblval );
-	blk->tblval = (int *) malloc ( len * sizeof(int) );
+        if (blk->tblval != NULL) free( blk->tblval );
+        blk->tblval = (int *) malloc ( len * sizeof(int) );
         if (blk->rval != NULL) free( blk->rval );
         blk->rval = (float *) malloc ( len * sizeof(float) );
         blk->max_len = len;
@@ -141,7 +142,12 @@ void brp_allocblk( BURP_BLK *blk, int  nele, int nval, int nt )
        else
          blk->drval = (double *) realloc ( blk->drval, len * sizeof(double) );
     }
-
+        
+    if (blk->charval == NULL)
+      blk->charval = (char *) malloc ( len * sizeof(char) );
+    else
+      blk->charval = (char *) realloc ( blk->charval, len * sizeof(char) );        
+        
 }
 
 /*
@@ -151,7 +157,7 @@ void brp_allocblk( BURP_BLK *blk, int  nele, int nval, int nt )
  *
  *  revision  :  Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -178,7 +184,7 @@ void brp_clrblk( BURP_BLK  *bblk )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -191,15 +197,15 @@ void brp_clrblkv( BURP_BLK  *bblk, float rval )
   if (bblk == NULL) return;
   cnt = BLK_NELE(bblk) * BLK_NVAL(bblk) * BLK_NT(bblk);
   if (BLK_STORE_TYPE(bblk)==STORE_FLOAT) {
-	for ( i = 0 ; i < cnt ; i++ )
+        for ( i = 0 ; i < cnt ; i++ )
         {
             (bblk)->rval[i] = rval;
             (bblk)->tblval[i] = -1;
         }
 
   } else if (BLK_STORE_TYPE(bblk)==STORE_INTEGER) {
-	int ival=(int)rval;
-	for ( i = 0 ; i < cnt ; i++ )
+        int ival=(int)rval;
+        for ( i = 0 ; i < cnt ; i++ )
             (bblk)->tblval[i] = ival;
   }
 }
@@ -211,7 +217,7 @@ void brp_clrblkv( BURP_BLK  *bblk, float rval )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -244,7 +250,7 @@ void brp_clrrpt( BURP_RPT *rpt )
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -273,7 +279,7 @@ int brp_convertblk( BURP_BLK  *bb,int mode )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -284,9 +290,9 @@ int brp_encodeblk( BURP_BLK  *bb )
    int istat;
 
    if (bb == NULL) return(-1);
-   
+
    istat = c_mrbcol( bb->dlstele, bb->lstele, BLK_NELE(bb) );
-   
+
    return( istat );
 }
 
@@ -297,7 +303,7 @@ int brp_encodeblk( BURP_BLK  *bb )
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -313,19 +319,19 @@ int  brp_findblk( BURP_BLK  *blk, BURP_RPT  *rpt )
 ** de recherche
 */
     if (BLK_BTYP(blk) != -1)
-      bkno = c_mrbloc( rpt->buffer, 
+      bkno = c_mrbloc( rpt->buffer,
               BLK_BFAM(blk), BLK_BDESC(blk), BLK_BTYP(blk),
-              BLK_BKNO(blk) ); 
-    else 
-      bkno = c_mrblocx( rpt->buffer, 
-              BLK_BFAM(blk), BLK_BDESC(blk), 
+              BLK_BKNO(blk) );
+    else
+      bkno = c_mrblocx( rpt->buffer,
+              BLK_BFAM(blk), BLK_BDESC(blk),
               BLK_BKNAT(blk), BLK_BKTYP(blk), BLK_BKSTP(blk),
-              BLK_BKNO(blk) ); 
+              BLK_BKNO(blk) );
 
 /*
 ** assigne la valeur de bkno trouve
 */
-    BLK_SetBKNO( blk, bkno );  
+    BLK_SetBKNO( blk, bkno );
 
     return( bkno );
 }
@@ -337,12 +343,12 @@ int  brp_findblk( BURP_BLK  *blk, BURP_RPT  *rpt )
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
  *  object    :  locate a report within a file
- *               
+ *
  */
 int  brp_findrpt( int iun, BURP_RPT *rpt )
 {
@@ -351,12 +357,12 @@ int  brp_findrpt( int iun, BURP_RPT *rpt )
 /*
 ** localise le premier enregistrement correspondant aux criteres de recherche
 */
-    handle = c_mrfloc( iun, RPT_HANDLE(rpt),RPT_STNID(rpt),RPT_IDTYP(rpt), 
-                    RPT_LATI(rpt), RPT_LONG(rpt), 
+    handle = c_mrfloc( iun, RPT_HANDLE(rpt),RPT_STNID(rpt),RPT_IDTYP(rpt),
+                    RPT_LATI(rpt), RPT_LONG(rpt),
                     RPT_DATE(rpt), RPT_TEMPS(rpt),
                     rpt->sup, rpt->nsup );
 /*
-** affecte le pointeur de l'enregistrement pour retourner la valeur de ce 
+** affecte le pointeur de l'enregistrement pour retourner la valeur de ce
 ** pointeur
 */
     RPT_SetHANDLE(rpt, handle);
@@ -372,7 +378,7 @@ int  brp_findrpt( int iun, BURP_RPT *rpt )
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -382,7 +388,7 @@ void  brp_freeblk( BURP_BLK *blk )
 {
 
    if ( blk == NULL ) return;
- 
+
   if ( blk->lstele ) {
     free( blk->lstele );
     blk->lstele = NULL;
@@ -399,6 +405,10 @@ void  brp_freeblk( BURP_BLK *blk )
     free( blk->rval );
     blk->rval = NULL;
   }
+   if ( blk->charval ) {
+       free( blk->charval);
+       blk->charval = NULL;
+   }
 
   blk->max_nele = 0;
   blk->max_nval = 0;
@@ -421,7 +431,7 @@ void  brp_freeblk( BURP_BLK *blk )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -448,7 +458,7 @@ void brp_freerpt( BURP_RPT *rpt )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -456,7 +466,7 @@ void brp_freerpt( BURP_RPT *rpt )
  */
 int  brp_getblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt)
 {
-	return (brp_readblk( bkno, blk, rpt, 1 ));
+        return (brp_readblk( bkno, blk, rpt, 1 ));
 }
 
 /*
@@ -466,7 +476,7 @@ int  brp_getblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -474,23 +484,23 @@ int  brp_getblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt)
  */
 int  brp_rdblkhdr(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt)
 {
-	int istat;
+        int istat;
 
-	if ((rpt == NULL)||(blk == NULL)) return -1;
+        if ((rpt == NULL)||(blk == NULL)) return -1;
 /*
 ** lire les informations du bloc
 */
-	istat = c_mrbprm( rpt->buffer, bkno,
+        istat = c_mrbprm( rpt->buffer, bkno,
                  &(blk->nele), &(blk->nval), &(blk->nt),
                  &(blk->bfam), &(blk->bdesc),
                  &(blk->btyp), &(blk->nbit),
                  &(blk->bit0), &(blk->datyp) );
-	c_mrbtyp( &(blk->bknat), &(blk->bktyp), &(blk->bkstp), 
+        c_mrbtyp( &(blk->bknat), &(blk->bktyp), &(blk->bkstp),
               BLK_BTYP(blk) );
 
         BLK_SetBKNO(blk, bkno);
 
-	return istat;
+        return istat;
 }
 /*
  *  module    :  BRP_READBLK
@@ -499,7 +509,7 @@ int  brp_rdblkhdr(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt)
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -507,39 +517,40 @@ int  brp_rdblkhdr(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt)
  */
 int  brp_readblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt, int docvt)
 {
-	int istat;
+        int istat;
 
-	if ((rpt == NULL)) {
+        if ((rpt == NULL)) {
             fprintf(stderr,"attention rpt nul \n");
            return -1;
         }
-	if ((blk == NULL)) {
+        if ((blk == NULL)) {
             fprintf(stderr,"attention blk nul \n");
            return -1;
         }
 /*
 ** lire les informations du bloc
 */
-	istat = c_mrbprm( rpt->buffer, bkno,
-                 &(blk->nele), &(blk->nval), &(blk->nt), 
-                 &(blk->bfam), &(blk->bdesc), 
-                 &(blk->btyp), &(blk->nbit), 
+        istat = c_mrbprm( rpt->buffer, bkno,
+                 &(blk->nele), &(blk->nval), &(blk->nt),
+                 &(blk->bfam), &(blk->bdesc),
+                 &(blk->btyp), &(blk->nbit),
                  &(blk->bit0), &(blk->datyp) );
-	c_mrbtyp( &(blk->bknat), &(blk->bktyp), &(blk->bkstp), 
+        c_mrbtyp( &(blk->bknat), &(blk->bktyp), &(blk->bkstp),
               BLK_BTYP(blk) );
 
-	if (istat < 0 ) return( istat );
+        if (istat < 0 ) return( istat );
 /*
-** allouer l'espace suffisante pour lire le bloc 
+** allouer l'espace suffisante pour lire le bloc
 */
-	if ( BLK_DATYP(blk) == 7 ) BLK_SetSTORE_TYPE(blk, STORE_DOUBLE );
-         if  (((BLK_NT(blk)) * (BLK_NVAL(blk)) *(BLK_NELE(blk))) != 0) 
-         {
+        if ( BLK_DATYP(blk) == DATYP_CHAR ) BLK_SetSTORE_TYPE(blk, STORE_CHAR );
+        if ( BLK_DATYP(blk) == 7 )          BLK_SetSTORE_TYPE(blk, STORE_DOUBLE );
+        
+        if  (((BLK_NT(blk)) * (BLK_NVAL(blk)) *(BLK_NELE(blk))) != 0) {
             brp_allocblk( blk, BLK_NELE(blk), BLK_NVAL(blk), BLK_NT(blk));
-         } else {
+        } else {
 /*            fprintf(stderr,"une des dimensions du block est nulle!!\n");*/
             return(-1);
-         }
+        }
 
 /*        bb = BLK_Data(blk);*/
 
@@ -550,36 +561,42 @@ int  brp_readblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt, int docvt)
                 istat = c_mrbxtr( rpt->buffer, bkno,
                  blk->lstele, blk->drval );
                 if (istat < 0 ) return( istat );
-		BLK_SetBKNO(blk, bkno);
+                BLK_SetBKNO(blk, bkno);
         } else if ( BLK_DATYP(blk) == 6 ) {  /* REEL 4 */
-		istat = c_mrbxtr( rpt->buffer, bkno,
+                istat = c_mrbxtr( rpt->buffer, bkno,
                  blk->lstele, blk->rval );
-		if (istat < 0 ) return( istat );
-		BLK_SetBKNO(blk, bkno);
-	} else {
-		istat = c_mrbxtr( rpt->buffer, bkno,
+                if (istat < 0 ) return( istat );
+                BLK_SetBKNO(blk, bkno);
+        } else if ( BLK_DATYP(blk) == 3 ) {
+                istat = c_mrbxtr( rpt->buffer, bkno,
+                 blk->lstele, blk->charval );
+                if (istat < 0 ) return( istat );
+                BLK_SetBKNO(blk, bkno);
+            
+        } else {
+                istat = c_mrbxtr( rpt->buffer, bkno,
                  blk->lstele, blk->tblval );
-		if (istat < 0 ) return( istat );
-		BLK_SetBKNO(blk, bkno);
+                if (istat < 0 ) return( istat );
+                BLK_SetBKNO(blk, bkno);
 /*
 ** convertir les donnees des valeurs entiere de BURP vers des valeurs reelles
 ** TBLVAL a RVAL si docvt et le blk n'est pas un marqueur
 */
-		if (docvt && (BLK_BKNAT(blk)%4) != 3) {
-			c_mrbcvt( blk->lstele, blk->tblval,
+                if (docvt && (BLK_BKNAT(blk)%4) != 3) {
+                        c_mrbcvt( blk->lstele, blk->tblval,
                 blk->rval, BLK_NELE(blk),
-                BLK_NVAL(blk), BLK_NT(blk), 
+                BLK_NVAL(blk), BLK_NT(blk),
                 BUFR_to_MKSA );
                         BLK_SetSTORE_TYPE(blk, STORE_FLOAT );
-		}
-	}
+                }
+        }
 
 /*
 ** decode les noms des elements lues
 */
     istat = c_mrbdcl( blk->lstele, blk->dlstele, BLK_NELE(blk) );
 
-	return( istat );
+        return( istat );
 }
 
 /*
@@ -589,7 +606,7 @@ int  brp_readblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt, int docvt)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -597,23 +614,23 @@ int  brp_readblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt, int docvt)
  */
 int  brp_getrpt( int iun, int handle, BURP_RPT  *rpt )
 {
-	int istat;
+        int istat;
 
-	if (rpt == NULL) return -1;
-	istat = brp_rdrpthdr( handle, rpt );
+        if (rpt == NULL) return -1;
+        istat = brp_rdrpthdr( handle, rpt );
 
-	if ( istat >= 0 ) {
-		if ( (RPT_LNGR(rpt)+20) > RPT_NSIZE(rpt) ) {
-			brp_allocrpt( rpt, (c_mrfmxl(iun)+2000) );
-		}
-		istat = c_mrfget( handle,
+        if ( istat >= 0 ) {
+                if ( (RPT_LNGR(rpt)+20) > RPT_NSIZE(rpt) ) {
+                        brp_allocrpt( rpt, (c_mrfmxl(iun)+2000) );
+                }
+                istat = c_mrfget( handle,
                       rpt->buffer );
-	}
-	if ( istat >= 0 ) {
-		istat = brp_getrpthdr( rpt );
-		RPT_SetHANDLE(rpt,handle);
-	}
-	return( istat );
+        }
+        if ( istat >= 0 ) {
+                istat = brp_getrpthdr( rpt );
+                RPT_SetHANDLE(rpt,handle);
+        }
+        return( istat );
 }
 
 /*
@@ -623,7 +640,7 @@ int  brp_getrpt( int iun, int handle, BURP_RPT  *rpt )
  *
  *  revision  : Handle Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -631,29 +648,29 @@ int  brp_getrpt( int iun, int handle, BURP_RPT  *rpt )
  */
 static int brp_getrpthdr( BURP_RPT *rpt )
 {
-	int istat;
+        int istat;
 
-	if (rpt == NULL) return -1;
+        if (rpt == NULL) return -1;
 
-	if ( rpt->nsup > 0 ) {
-		if (rpt->sup!=NULL) free( rpt->sup );
-		rpt->sup = (int *)malloc(sizeof(int)*rpt->nsup );
-	}
-	if ( rpt->nxaux > 0 ) {
-		if (rpt->xaux!=NULL) free( rpt->xaux );
-		rpt->xaux = (int *)malloc(sizeof(int)*rpt->nxaux );
-	}
+        if ( rpt->nsup > 0 ) {
+                if (rpt->sup!=NULL) free( rpt->sup );
+                rpt->sup = (int *)malloc(sizeof(int)*rpt->nsup );
+        }
+        if ( rpt->nxaux > 0 ) {
+                if (rpt->xaux!=NULL) free( rpt->xaux );
+                rpt->xaux = (int *)malloc(sizeof(int)*rpt->nxaux );
+        }
 /*
 ** ramasser l'entete du rapport lu
 */
-	istat = c_mrbhdr( rpt->buffer, &(rpt->temps), &(rpt->flgs), 
-              rpt->stnid, &(rpt->idtype), &(rpt->lati), 
-              &(rpt->longi), &(rpt->dx), &(rpt->dy), 
-			  &(rpt->elev), &(rpt->drnd), &(rpt->date), 
-              &(rpt->oars), &(rpt->runn), &(rpt->nblk), rpt->sup, 
+        istat = c_mrbhdr( rpt->buffer, &(rpt->temps), &(rpt->flgs),
+              rpt->stnid, &(rpt->idtype), &(rpt->lati),
+              &(rpt->longi), &(rpt->dx), &(rpt->dy),
+                          &(rpt->elev), &(rpt->drnd), &(rpt->date),
+              &(rpt->oars), &(rpt->runn), &(rpt->nblk), rpt->sup,
               rpt->nsup, rpt->xaux, rpt->nxaux );
 
-	return( istat );
+        return( istat );
 }
 
 /*
@@ -663,7 +680,7 @@ static int brp_getrpthdr( BURP_RPT *rpt )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -674,7 +691,7 @@ float brp_msngval(void)
 /*
 ** constante pour les valeurs manquantes
 */
-   static float missing_value=0.0; 
+   static float missing_value=0.0;
 
    if ( missing_value == 0.0 )
    {
@@ -689,7 +706,7 @@ float brp_msngval(void)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -710,7 +727,7 @@ int brp_SetMissing(char* opt, float val)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -730,7 +747,7 @@ int brp_SetOptFloat(char* opt, float val)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -750,12 +767,12 @@ int brp_SetOptChar(char* opt, char * val)
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
  *  object    :  instantiate a new block entity
- *               
+ *
  */
 BURP_BLK *brp_newblk (void)
 {
@@ -773,6 +790,7 @@ BURP_BLK *brp_newblk (void)
      blk->store_type = STORE_FLOAT;
 
      blk->drval = NULL;
+     blk->charval = NULL;
      brp_resetblkhdr( blk );
      return( blk );
 }
@@ -784,19 +802,19 @@ BURP_BLK *brp_newblk (void)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
  *  object    :  instantiate a new report entity
- *               
+ *
  */
 BURP_RPT *brp_newrpt( void )
 {
      BURP_RPT  *rpt;
 
      rpt = (BURP_RPT *) malloc( sizeof(BURP_RPT) );
- 
+
      rpt->buffer = NULL;
      rpt->nsize = 0;
      rpt->nsup = 0;
@@ -815,27 +833,27 @@ BURP_RPT *brp_newrpt( void )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
  *  object    :  initialize the content of a report buffer with its header
- *               
+ *
  */
 int brp_putrpthdr( int   iun, BURP_RPT *rpt )
 {
     int  istat;
 
-	if (rpt == NULL) return -1;
+        if (rpt == NULL) return -1;
 /*
-** initialiser l'entete du rapport 
+** initialiser l'entete du rapport
 */
-    istat = c_mrbini( iun, rpt->buffer, 
-                   RPT_TEMPS(rpt), RPT_FLGS(rpt), 
-                   RPT_STNID(rpt), RPT_IDTYP(rpt), RPT_LATI(rpt), 
-                   RPT_LONG(rpt), RPT_DX(rpt), RPT_DY(rpt), 
-			       RPT_ELEV(rpt), RPT_DRND(rpt), RPT_DATE(rpt), 
-                   RPT_OARS(rpt), RPT_RUNN(rpt), rpt->sup, 
+    istat = c_mrbini( iun, rpt->buffer,
+                   RPT_TEMPS(rpt), RPT_FLGS(rpt),
+                   RPT_STNID(rpt), RPT_IDTYP(rpt), RPT_LATI(rpt),
+                   RPT_LONG(rpt), RPT_DX(rpt), RPT_DY(rpt),
+                               RPT_ELEV(rpt), RPT_DRND(rpt), RPT_DATE(rpt),
+                   RPT_OARS(rpt), RPT_RUNN(rpt), rpt->sup,
                    rpt->nsup, rpt->xaux, rpt->nxaux );
 
     rpt->init_hdr = 0;
@@ -849,27 +867,27 @@ int brp_putrpthdr( int   iun, BURP_RPT *rpt )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
  *  object    :  initialize the content of a report buffer with its header
- *               
+ *
  */
 int brp_initrpthdr( int   iun, BURP_RPT *rpt )
 {
     int  istat;
 
-	if (rpt == NULL) return -1;
+        if (rpt == NULL) return -1;
 /*
-** initialiser l'entete du rapport 
+** initialiser l'entete du rapport
 */
-    istat = c_mrbini( iun, rpt->buffer, 
-                   RPT_TEMPS(rpt), RPT_FLGS(rpt), 
-                   RPT_STNID(rpt), RPT_IDTYP(rpt), RPT_LATI(rpt), 
-                   RPT_LONG(rpt), RPT_DX(rpt), RPT_DY(rpt), 
-			       RPT_ELEV(rpt), RPT_DRND(rpt), RPT_DATE(rpt), 
-                   RPT_OARS(rpt), RPT_RUNN(rpt), rpt->sup, 
+    istat = c_mrbini( iun, rpt->buffer,
+                   RPT_TEMPS(rpt), RPT_FLGS(rpt),
+                   RPT_STNID(rpt), RPT_IDTYP(rpt), RPT_LATI(rpt),
+                   RPT_LONG(rpt), RPT_DX(rpt), RPT_DY(rpt),
+                               RPT_ELEV(rpt), RPT_DRND(rpt), RPT_DATE(rpt),
+                   RPT_OARS(rpt), RPT_RUNN(rpt), rpt->sup,
                    rpt->nsup, rpt->xaux, rpt->nxaux );
 
     rpt->init_hdr = 0;
@@ -884,7 +902,7 @@ int brp_initrpthdr( int   iun, BURP_RPT *rpt )
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -922,6 +940,12 @@ int brp_putblk( BURP_RPT *rpt, BURP_BLK *blk )
                      bdesc, btyp, nbit,
                      &(blk->bit0), datyp, blk->lstele,
                      blk->drval );
+   } else if ( BLK_DATYP(blk) == 3 ) {
+       istat = c_mrbadd( rpt->buffer, &(blk->bkno), BLK_NELE(blk),
+                     BLK_NVAL(blk), BLK_NT(blk), bfam,
+                     bdesc, btyp, nbit,
+                     &(blk->bit0), datyp, blk->lstele,
+                     blk->charval );
    } else {
        istat = c_mrbadd( rpt->buffer, &(blk->bkno), BLK_NELE(blk),
                      BLK_NVAL(blk), BLK_NT(blk), bfam,
@@ -929,7 +953,7 @@ int brp_putblk( BURP_RPT *rpt, BURP_BLK *blk )
                      &(blk->bit0), datyp, blk->lstele,
                      blk->tblval );
    }
-   return( istat );    
+   return( istat );
 }
 
 
@@ -940,30 +964,30 @@ int brp_putblk( BURP_RPT *rpt, BURP_BLK *blk )
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
- *  object    :  read the header of a report without reading 
+ *  object    :  read the header of a report without reading
  *               the report entirely
  */
 int brp_rdrpthdr( int handle, BURP_RPT *rpt )
 {
     int istat;
 
-	if (rpt == NULL) return -1;
+        if (rpt == NULL) return -1;
 
     if ( rpt->nsup > 0 ) {
       if (rpt->sup!=NULL) free( rpt->sup );
       rpt->sup = (int *)malloc(sizeof(int)*rpt->nsup);
     }
 /*
-** ramasser l'entete du rapport 
+** ramasser l'entete du rapport
 */
     istat = c_mrfprm( handle,
-              rpt->stnid, &(rpt->idtype), &(rpt->lati), 
-              &(rpt->longi), &(rpt->dx), &(rpt->dy), 
-			  &(rpt->date), &(rpt->temps), &(rpt->flgs),
+              rpt->stnid, &(rpt->idtype), &(rpt->lati),
+              &(rpt->longi), &(rpt->dx), &(rpt->dy),
+                          &(rpt->date), &(rpt->temps), &(rpt->flgs),
               rpt->sup, rpt->nsup, &(rpt->lngr) );
 
     return( istat );
@@ -976,7 +1000,7 @@ int brp_rdrpthdr( int handle, BURP_RPT *rpt )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -989,7 +1013,7 @@ void brp_resetblkhdr( BURP_BLK *blk )
     blk->nval = -1;
     blk->nt = -1;
     BLK_SetBKNO(blk,0);
-    BLK_SetBFAM(blk, -1); 
+    BLK_SetBFAM(blk, -1);
     BLK_SetBDESC(blk, -1);
     BLK_SetBTYP(blk, -1);
     BLK_SetBKNAT(blk, -1);
@@ -1006,7 +1030,7 @@ void brp_resetblkhdr( BURP_BLK *blk )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1017,7 +1041,7 @@ void brp_copyblk( BURP_BLK *dest, const BURP_BLK *source)
     int e,v,t;
     if (source == NULL)
     {
-      fprintf(stderr," blk pointer is NULL, brp_copyblk not done!\n"); 
+      fprintf(stderr," blk pointer is NULL, brp_copyblk not done!\n");
       return;
     }
     brp_allocblk( dest,BLK_NELE(source),BLK_NVAL(source), BLK_NT(source))  ;
@@ -1035,7 +1059,7 @@ void brp_copyblk( BURP_BLK *dest, const BURP_BLK *source)
 
     for (e = 0; e < BLK_NELE(source); e++) {
         if (source->dlstele != NULL)
-            BLK_SetDLSTELE(dest,e,BLK_DLSTELE(source,e)); 
+            BLK_SetDLSTELE(dest,e,BLK_DLSTELE(source,e));
         if (source->lstele != NULL)
             BLK_SetLSTELE(dest,e,BLK_LSTELE(source,e));
     }
@@ -1045,13 +1069,15 @@ void brp_copyblk( BURP_BLK *dest, const BURP_BLK *source)
                 if (source->tblval != NULL)
                     BLK_SetTBLVAL(dest,e,v,t,BLK_TBLVAL(source,e,v,t));
                 if (source->rval != NULL)
-                    BLK_SetRVAL(dest,e,v,t,BLK_RVAL(source,e,v,t)) ; 
-                if (source->drval != NULL) 
-                    BLK_SetDVAL(dest,e,v,t,BLK_DVAL(source,e,v,t)); 
+                    BLK_SetRVAL(dest,e,v,t,BLK_RVAL(source,e,v,t)) ;
+                if (source->drval != NULL)
+                    BLK_SetDVAL(dest,e,v,t,BLK_DVAL(source,e,v,t));
+                if ( source->charval != NULL)
+                    BLK_SetCVAL(dest,v,t, BLK_CVAL(source,v,t));                
             }
         }
     }
-
+    
 
 }
 /*
@@ -1061,7 +1087,7 @@ void brp_copyblk( BURP_BLK *dest, const BURP_BLK *source)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1072,14 +1098,14 @@ void brp_resizeblk( BURP_BLK *dest,int nele, int nval, int nt)
     int e,v,t;
     int mele, mval, mnt;
     BURP_BLK * source;
-    if (dest == NULL) 
+    if (dest == NULL)
     {
-      fprintf(stderr," blk pointer is NULL, resizeblk not done!\n"); 
+      fprintf(stderr," blk pointer is NULL, resizeblk not done!\n");
         return;
     }
     source = brp_newblk();
     /* faire une copie dans et la mettre dans source */
-    brp_copyblk(source,dest); 
+    brp_copyblk(source,dest);
     /* reallouer des avec les nouvelles dimensions */
     brp_allocblk( dest, nele, nval, nt)  ;
     /* copier ce qui dans source et le mettre dans dest.
@@ -1103,7 +1129,7 @@ void brp_resizeblk( BURP_BLK *dest,int nele, int nval, int nt)
     mnt  = BLK_NT(source)   > BLK_NT(dest)   ? BLK_NT(dest):BLK_NT(source);
     for (e = 0; e != mele; e++) {
         if (source->dlstele != NULL)
-            BLK_SetDLSTELE(dest,e,BLK_DLSTELE(source,e)); 
+            BLK_SetDLSTELE(dest,e,BLK_DLSTELE(source,e));
         if (source->lstele != NULL)
             BLK_SetLSTELE(dest,e,BLK_LSTELE(source,e));
     }
@@ -1113,9 +1139,11 @@ void brp_resizeblk( BURP_BLK *dest,int nele, int nval, int nt)
                 if (source->tblval != NULL)
                     BLK_SetTBLVAL(dest,e,v,t,BLK_TBLVAL(source,e,v,t));
                 if (source->rval != NULL)
-                    BLK_SetRVAL(dest,e,v,t,BLK_RVAL(source,e,v,t)) ; 
+                    BLK_SetRVAL(dest,e,v,t,BLK_RVAL(source,e,v,t)) ;
                 if ((BLK_STORE_TYPE(source) == STORE_DOUBLE ) && source->drval != NULL )
-                    BLK_SetDVAL(dest,e,v,t,BLK_DVAL(source,e,v,t)); 
+                    BLK_SetDVAL(dest,e,v,t,BLK_DVAL(source,e,v,t));
+                if ((BLK_STORE_TYPE(source) == STORE_CHAR ) && source->charval != NULL )
+                    BLK_SetCVAL(dest,v,t,BLK_CVAL(source,v,t));
             }
         }
     }
@@ -1128,7 +1156,7 @@ void brp_resizeblk( BURP_BLK *dest,int nele, int nval, int nt)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1140,9 +1168,9 @@ void brp_resizeblk_v2( BURP_BLK **inblk,int nele, int nval, int nt)
     int mele, mval, mnt;
     BURP_BLK * dest;
     BURP_BLK * source = *inblk;
-    if (source == NULL) 
+    if (source == NULL)
     {
-      fprintf(stderr," blk pointer is NULL, resizeblk not done!\n"); 
+      fprintf(stderr," blk pointer is NULL, resizeblk not done!\n");
         return;
     }
     dest = brp_newblk();
@@ -1165,7 +1193,7 @@ void brp_resizeblk_v2( BURP_BLK **inblk,int nele, int nval, int nt)
     mnt  = BLK_NT(source)   > BLK_NT(dest)   ? BLK_NT(dest):BLK_NT(source);
     for (e = 0; e != mele; e++) {
         if (source->dlstele != NULL)
-            BLK_SetDLSTELE(dest,e,BLK_DLSTELE(source,e)); 
+            BLK_SetDLSTELE(dest,e,BLK_DLSTELE(source,e));
         if (source->lstele != NULL)
             BLK_SetLSTELE(dest,e,BLK_LSTELE(source,e));
     }
@@ -1175,9 +1203,9 @@ void brp_resizeblk_v2( BURP_BLK **inblk,int nele, int nval, int nt)
                 if (source->tblval != NULL)
                     BLK_SetTBLVAL(dest,e,v,t,BLK_TBLVAL(source,e,v,t));
                 if (source->rval != NULL)
-                    BLK_SetRVAL(dest,e,v,t,BLK_RVAL(source,e,v,t)) ; 
-                if ((BLK_STORE_TYPE(source) == STORE_DOUBLE ) && source->drval != NULL ) { 
-                    BLK_SetDVAL(dest,e,v,t,BLK_DVAL(source,e,v,t)); 
+                    BLK_SetRVAL(dest,e,v,t,BLK_RVAL(source,e,v,t)) ;
+                if ((BLK_STORE_TYPE(source) == STORE_DOUBLE ) && source->drval != NULL ) {
+                    BLK_SetDVAL(dest,e,v,t,BLK_DVAL(source,e,v,t));
                     }
             }
         }
@@ -1192,7 +1220,7 @@ void brp_resizeblk_v2( BURP_BLK **inblk,int nele, int nval, int nt)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1203,10 +1231,10 @@ int brp_delblk(BURP_RPT *rpt, const BURP_BLK *blk)
    int istat = -1;
    if ((rpt == NULL) && (blk == NULL))
    {
-      fprintf(stderr,"rpt adn blk pointers are NULL\n"); 
+      fprintf(stderr,"rpt adn blk pointers are NULL\n");
       return istat;
    }
-   if (rpt->buffer != NULL) 
+   if (rpt->buffer != NULL)
       istat = c_mrbdel(rpt->buffer,BLK_BKNO(blk));
    return istat;
 }
@@ -1217,7 +1245,7 @@ int brp_delblk(BURP_RPT *rpt, const BURP_BLK *blk)
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1225,9 +1253,9 @@ int brp_delblk(BURP_RPT *rpt, const BURP_BLK *blk)
  */
 int brp_delrpt(BURP_RPT *rpt)
 {
-    if (rpt == NULL) 
+    if (rpt == NULL)
     {
-       fprintf(stderr,"rpt  pointer is NULL\n"); 
+       fprintf(stderr,"rpt  pointer is NULL\n");
         return -1;
     }
      return(c_mrfdel(RPT_HANDLE(rpt))) ;
@@ -1240,7 +1268,7 @@ int brp_delrpt(BURP_RPT *rpt)
  *
  *  revision  : Hamid Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1266,10 +1294,10 @@ void brp_resetrpthdr( BURP_RPT *rpt )
     rpt->nblk = 0;
     rpt->nsup = 0;
     rpt->nxaux = 0;
-	if (rpt->xaux!=NULL) free( rpt->xaux );
-	rpt->xaux = NULL;
-	if (rpt->sup!=NULL) free( rpt->sup );
-	rpt->sup = NULL;
+        if (rpt->xaux!=NULL) free( rpt->xaux );
+        rpt->xaux = NULL;
+        if (rpt->sup!=NULL) free( rpt->sup );
+        rpt->sup = NULL;
 }
 /*
  *  module    :  brp_copytrpthdr
@@ -1278,7 +1306,7 @@ void brp_resetrpthdr( BURP_RPT *rpt )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1286,9 +1314,9 @@ void brp_resetrpthdr( BURP_RPT *rpt )
  */
 void brp_copyrpthdr( BURP_RPT * dest, const BURP_RPT *source )
 {
-   if (source == NULL) 
+   if (source == NULL)
    {
-      fprintf(stderr,"rpt source  pointer is NULL\n"); 
+      fprintf(stderr,"rpt source  pointer is NULL\n");
       return ;
    }
    RPT_SetHANDLE(dest,RPT_HANDLE(source));
@@ -1314,7 +1342,7 @@ void brp_copyrpthdr( BURP_RPT * dest, const BURP_RPT *source )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1323,9 +1351,9 @@ void brp_copyrpthdr( BURP_RPT * dest, const BURP_RPT *source )
 void brp_copyrpt( BURP_RPT * dest, const BURP_RPT *source )
 {
    int i;
-   if (source == NULL) 
+   if (source == NULL)
    {
-      fprintf(stderr,"rpt source  pointer is NULL\n"); 
+      fprintf(stderr,"rpt source  pointer is NULL\n");
       return ;
    }
    brp_resetrpthdr( dest );
@@ -1359,7 +1387,7 @@ void brp_copyrpt( BURP_RPT * dest, const BURP_RPT *source )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1377,13 +1405,13 @@ void brp_resizerpt( BURP_RPT * dest, int NewSize )
  *  author    :  Souvanlasy Viengsvanh
  *  revsion   :  Hamid Benhocine
  *purpose:  retourner l'indice d'un element dans un vecteur d'elements non codes
- *        
+ *
  *parameters:
  *
  *   code    : le code de BUFR decode recherche dans  DLSTELE
  *
  *   blk     : pointeur vers une structure contenant les informations sur
- *             un bloc de donnees, 
+ *             un bloc de donnees,
  *             dont DLSTELE qui contient la liste des elements decodes
  *             et NELE le nombre d'element dans DLSTELE
  *
@@ -1413,7 +1441,7 @@ int  brp_searchdlste( int  code, BURP_BLK *blk )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1444,7 +1472,7 @@ void brp_setstnid( BURP_RPT *rpt, const char *stnid )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1454,7 +1482,7 @@ int brp_writerpt( int iun, BURP_RPT *rpt, int handle )
 {
     int istat;
 
-	if (rpt == NULL) return -1;
+        if (rpt == NULL) return -1;
 /*
 ** le nouveau enregistrement sera ecrit a la fin du fichier
 */
@@ -1471,7 +1499,7 @@ int brp_writerpt( int iun, BURP_RPT *rpt, int handle )
  *
  *  revision  :
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -1519,11 +1547,11 @@ int brp_updrpthdr( int iun, BURP_RPT *rpt )
  * Brp_Open --
  *
  *
- * Author: Vanh Souvanlasy 
+ * Author: Vanh Souvanlasy
  * revision : Hamid Benhocine
  *
  * Results:
- *      
+ *
  *
  * Side effects:
  *
@@ -1562,7 +1590,7 @@ int brp_updrpthdr( int iun, BURP_RPT *rpt )
    istat = c_fnom( iun , filename, type, 0 );
    if ( istat != 0 )
    {
-       fprintf(stderr,"Unable to open file as %s : %s\n", 
+       fprintf(stderr,"Unable to open file as %s : %s\n",
                 type,  filename);
        c_fclos( iun );
        return istat;
@@ -1573,7 +1601,7 @@ int brp_updrpthdr( int iun, BURP_RPT *rpt )
    {
        istat = c_mrfcls( iun );
        istat = c_fclos( iun );
-       fprintf(stderr,"Unable to open file as %s : %s\n", 
+       fprintf(stderr,"Unable to open file as %s : %s\n",
                 mode,  filename);
        c_fclos( iun );
        return istat;
@@ -1581,5 +1609,3 @@ int brp_updrpthdr( int iun, BURP_RPT *rpt )
    return istat;
 
 }
-
-

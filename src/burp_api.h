@@ -6,7 +6,7 @@
  *
  *  revision  : Hamid.Benhocine
  *
- *  status    :  
+ *  status    :
  *
  *  language  :  C
  *
@@ -18,7 +18,7 @@
 
 
 #ifndef _burp_api_h_
-#define	_burp_api_h_
+#define _burp_api_h_
 #include "declare.h"
 
  __BEGIN_DECLS
@@ -30,19 +30,20 @@
  * actually, it is to and from floating points with bufr integers
  */
 
-#define  BUFR_to_MKSA		0
-#define  MKSA_to_BUFR		1
-#define  END_BURP_FILE 		0
+#define  BUFR_to_MKSA           0
+#define  MKSA_to_BUFR           1
+#define  END_BURP_FILE          0
 
 /*
  * how data is stored in a data block
  * with STORE_INTEGER, calls to brp_convertblk can be omitted
- * with STORE_FLOAT or STORE_DOUBLE, brp_convertblk must be called 
+ * with STORE_FLOAT or STORE_DOUBLE, brp_convertblk must be called
  * to write out data correctly
  */
 #define  STORE_INTEGER     'I'
 #define  STORE_FLOAT       'F'
 #define  STORE_DOUBLE      'D'
+#define  STORE_CHAR        'C'
 
 /*
  * constants for specifying datyp
@@ -96,7 +97,7 @@
 /*
  * structure definition of a BURP Report
  */
-typedef struct  
+typedef struct
 {
     int  *buffer;
     int  handle;
@@ -144,6 +145,7 @@ typedef  struct
     int    *tblval;
     float  *rval;
     double *drval;
+    char   *charval;
     int    max_nval, max_nele, max_nt;
     int    max_len;
 } BURP_BLK ;
@@ -157,23 +159,23 @@ typedef  struct
  * current definition do not cover all available field
  * since they are not used by anyone yet.
  */
-#define  RPT_HANDLE(rpt)    	((rpt)/**/->handle)
-#define  RPT_NSIZE(rpt)     	((rpt)/**/->nsize)
-#define  RPT_TEMPS(rpt)     	((rpt)/**/->temps)
-#define  RPT_FLGS(rpt)      	((rpt)/**/->flgs)
-#define  RPT_STNID(rpt)     	((rpt)/**/->stnid)
-#define  RPT_IDTYP(rpt)     	((rpt)/**/->idtype)
-#define  RPT_LATI(rpt)      	((rpt)/**/->lati)
-#define  RPT_LONG(rpt)      	((rpt)/**/->longi)
-#define  RPT_DX(rpt)        	((rpt)/**/->dx)
-#define  RPT_DY(rpt)        	((rpt)/**/->dy)
-#define  RPT_ELEV(rpt)      	((rpt)/**/->elev)
-#define  RPT_DRND(rpt)      	((rpt)/**/->drnd)
-#define  RPT_DATE(rpt)      	((rpt)/**/->date)
-#define  RPT_OARS(rpt)      	((rpt)/**/->oars)
-#define  RPT_RUNN(rpt)      	((rpt)/**/->runn)
-#define  RPT_NBLK(rpt)      	((rpt)/**/->nblk)
-#define  RPT_LNGR(rpt)      	((rpt)/**/->lngr)
+#define  RPT_HANDLE(rpt)        ((rpt)/**/->handle)
+#define  RPT_NSIZE(rpt)         ((rpt)/**/->nsize)
+#define  RPT_TEMPS(rpt)         ((rpt)/**/->temps)
+#define  RPT_FLGS(rpt)          ((rpt)/**/->flgs)
+#define  RPT_STNID(rpt)         ((rpt)/**/->stnid)
+#define  RPT_IDTYP(rpt)         ((rpt)/**/->idtype)
+#define  RPT_LATI(rpt)          ((rpt)/**/->lati)
+#define  RPT_LONG(rpt)          ((rpt)/**/->longi)
+#define  RPT_DX(rpt)            ((rpt)/**/->dx)
+#define  RPT_DY(rpt)            ((rpt)/**/->dy)
+#define  RPT_ELEV(rpt)          ((rpt)/**/->elev)
+#define  RPT_DRND(rpt)          ((rpt)/**/->drnd)
+#define  RPT_DATE(rpt)          ((rpt)/**/->date)
+#define  RPT_OARS(rpt)          ((rpt)/**/->oars)
+#define  RPT_RUNN(rpt)          ((rpt)/**/->runn)
+#define  RPT_NBLK(rpt)          ((rpt)/**/->nblk)
+#define  RPT_LNGR(rpt)          ((rpt)/**/->lngr)
 
 
 /*
@@ -185,7 +187,7 @@ typedef  struct
  * since they are not used by anyone yet.
  */
 /* for internal use only */
-extern  void       brp_setstnid( BURP_RPT *rpt, const char *stnid ); 
+extern  void       brp_setstnid( BURP_RPT *rpt, const char *stnid );
 
 #define  RPT_SetHANDLE(rpt,val)    (rpt)/**/->handle=val
 #define  RPT_SetTEMPS(rpt,val)     (rpt)/**/->temps=val
@@ -226,9 +228,10 @@ extern  void       brp_setstnid( BURP_RPT *rpt, const char *stnid );
 #define  BLK_Data(blk)             ((blk)/**/->data)
 #define  BLK_DLSTELE(blk,e)        ((blk)->dlstele[e])
 #define  BLK_LSTELE(blk,e)         ((blk)->lstele[e])
-#define  BLK_TBLVAL(blk,e,v,t)     (blk)->tblval[e + ((blk)->nele)*(v+((blk)->nval)*t)]
-#define  BLK_RVAL(blk,e,v,t)       (blk)->rval[e + ((blk)->nele)*(v+((blk)->nval)*t)]
-#define  BLK_DVAL(blk,e,v,t)       (blk)->drval[e + ((blk)->nele)*(v+((blk)->nval)*t)]
+#define  BLK_TBLVAL(blk,e,v,t)     (blk)->tblval[(e) + ((blk)->nele)*((v)+((blk)->nval)*(t))]
+#define  BLK_RVAL(blk,e,v,t)       (blk)->rval[  (e) + ((blk)->nele)*((v)+((blk)->nval)*(t))]
+#define  BLK_DVAL(blk,e,v,t)       (blk)->drval[ (e) + ((blk)->nele)*((v)+((blk)->nval)*(t))]
+#define  BLK_CVAL(blk,l,c)         ((blk)->charval[ (l)*((blk)->nt)+(c)  ])
 #define  BLK_STORE_TYPE(blk)       ((blk)->store_type)
 
 /*
@@ -250,9 +253,10 @@ extern  void       brp_setstnid( BURP_RPT *rpt, const char *stnid );
 #define  BLK_SetBKSTP(blk,val)          (blk)/**/->bkstp=val
 #define  BLK_SetNBIT(blk,val)           (blk)/**/->nbit=val
 #define  BLK_SetDATYP(blk,val)          (blk)/**/->datyp=val
-#define  BLK_SetDVAL(blk,e,v,t,val)     (blk)->drval [e + ((blk)->nele)*(v+((blk)->nval)*t)]=val
-#define  BLK_SetTBLVAL(blk,e,v,t,val)   (blk)->tblval[e + ((blk)->nele)*(v+((blk)->nval)*t)]=val
-#define  BLK_SetRVAL(blk,e,v,t,val)     (blk)->rval[  e + ((blk)->nele)*(v+((blk)->nval)*t)]=val
+#define  BLK_SetDVAL(blk,e,v,t,val)     (blk)->drval [(e) + ((blk)->nele)*((v)+((blk)->nval)*(t))]=val
+#define  BLK_SetTBLVAL(blk,e,v,t,val)   (blk)->tblval[(e) + ((blk)->nele)*((v)+((blk)->nval)*(t))]=val
+#define  BLK_SetRVAL(blk,e,v,t,val)     (blk)->rval[  (e) + ((blk)->nele)*((v)+((blk)->nval)*(t))]=val
+#define  BLK_SetCVAL(blk,l,c,val)       (blk)->charval[ (l)*((blk)->nt)+(c)  ]=val;
 #define  BLK_SetLSTELE(blk,i,val)       (blk)->lstele[i]=val
 #define  BLK_SetDLSTELE(blk,i,val)      (blk)->dlstele[i]=val
 #define  BLK_SetSTORE_TYPE(blk,val)     (blk)->store_type=val
@@ -267,7 +271,7 @@ extern  void       brp_allocrpt( BURP_RPT *rpt, int  nsize );
 extern  void       brp_allocblk( BURP_BLK *blk, int  nele, int nval, int nt );
 
 /*
- *  find elements 
+ *  find elements
  */
 extern  int        brp_searchdlste( int  code, BURP_BLK *blk );
 /*
@@ -287,7 +291,7 @@ extern  void       brp_clrblkv(BURP_BLK  *bblk, float val);
 extern  void       brp_clrrpt( BURP_RPT *rpt );
 
 
-/* reset blk and rpt headers to default as initialised 
+/* reset blk and rpt headers to default as initialised
  * in brp_newblk and brp_newblk
  */
 extern  void       brp_resetrpthdr( BURP_RPT *rpt );
@@ -382,3 +386,4 @@ extern  int        c_mrbdel ( int *buf, int bkno);
 ***************************************************************************/
  __END_DECLS
 #endif /* _burp_api_h_ */
+ 
