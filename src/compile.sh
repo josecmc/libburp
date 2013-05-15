@@ -1,14 +1,5 @@
 #!/usr/bin/ksh
 set -x
-mkdir -p $HOME/`uname`/burplib_c-dev/include
-mkdir -p $HOME/`uname`/burplib_c-dev/lib
-rm -rf ssmtempo
-mkdir -p ssmtempo/lib
-mkdir -p ssmtempo/include
-
-
-INC_DIR=$HOME/`uname`/burplib_c-dev/include
-LIB_DIR=$HOME/`uname`/burplib_c-dev/lib
 
 rm -rf  core *.o *.a *.so 
 
@@ -22,17 +13,24 @@ ls *.o
 
 if  [ "`uname`" = "AIX" ]
 then
+   OS="aix71-ppc7-64"
    ar -X64 scru libburp_c.a *.o 
    ranlib libburp_c.a
-elif [ "`uname`" = "IRIX64" ]
+elif [ "`uname`" = "Linux" ]
 then
-   ar scru libburp_c.a *.o 
-else
+   OS="linux26-i386"
    ar scru libburp_c.a *.o 
    ranlib  libburp_c.a
+else
+   echo "Unsupported architecture: `uname`"
+   exit 1
 fi
-cp -rf libburp_c.a  $LIB_DIR
-cp -rf *.h          $INC_DIR
-cp -rf libburp_c.a ssmtempo/lib
-cp -rf *.h         ssmtempo/include
+
+mkdir -p ../lib/$OS
+mkdir -p ../include
+
+cp -rf libburp_c.a ../lib
+mv libburp_c.a  ../lib/$OS
+ln -s ../lib/$OS/libburp_c.a
+cp -rf *.h      ../include
 
