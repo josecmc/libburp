@@ -14,7 +14,7 @@ export VERNO=`grep Version ./.ssm.d/control | sed 's/Version://g' | sed 's/ *//g
 mtype=`uname -s`
 case  $mtype  in
 IRIX64 ) export HOSTTYPE=irix65-mips-n32 ;;
-AIX    ) export HOSTTYPE=aix51-ppc-64 ;;
+AIX    ) export HOSTTYPE=aix71-ppc7-64 ;;
 Linux  ) export HOSTTYPE=linux26-i386 ;;
 esac
 
