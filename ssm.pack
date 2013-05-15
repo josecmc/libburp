@@ -29,7 +29,9 @@ export BINAIRE_SSM="${PKG_NAME}_${VERNO}_${HOSTTYPE}"
 
 cd ..
 cp -rf trunk ${BINAIRE_SSM}
-tar cvfz ${BINAIRE_SSM}.ssm ${BINAIRE_SSM}
+tar cvf ${BINAIRE_SSM}.tar ${BINAIRE_SSM}
+gzip ${BINAIRE_SSM}.tar
+mv ${BINAIRE_SSM}.tar.gz ${BINAIRE_SSM}.ssm
 
 # install software
 # (pipe to xargs echo is to avoid exiting on error if uninstall/unpublish fails)
