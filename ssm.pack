@@ -32,9 +32,10 @@ cp -rf trunk ${BINAIRE_SSM}
 tar cvfz ${BINAIRE_SSM}.ssm ${BINAIRE_SSM}
 
 # install software
+# (pipe to xargs echo is to avoid exiting on error if uninstall/unpublish fails)
 echo "package = ${BINAIRE_SSM}"
-#ssm unpublish -d $DEST  -p ${BINAIRE_SSM} --force
-ssm uninstall -d $DEST  -p ${BINAIRE_SSM} --force
+#ssm unpublish -d $DEST  -p ${BINAIRE_SSM} --force | xargs echo
+ssm uninstall -d $DEST  -p ${BINAIRE_SSM} --force | xargs echo
 ssm install -d $DEST -u `pwd` -p ${BINAIRE_SSM}   --force
 #ssm publish -d $DEST          -p ${BINAIRE_SSM}   --force
 
