@@ -1,6 +1,10 @@
 #!/usr/bin/ksh
 set -x
 
+SCRIPT=`readlink -f $0`
+SCRIPT_PATH=`dirname $SCRIPT`
+cd $SCRIPT_PATH
+
 rm -rf  core *.o *.a *.so 
 
 #r.compile  -src bufr_blk.c -optc=-O3 
