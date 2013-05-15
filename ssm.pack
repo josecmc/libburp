@@ -33,10 +33,10 @@ tar cvfz ${BINAIRE_SSM}.ssm ${BINAIRE_SSM}
 
 # install software
 echo "package = ${BINAIRE_SSM}"
-#ssm unpublish -d $DEST  -p ${BINAIRE_SSM} --force --yes
-ssm uninstall -d $DEST  -p ${BINAIRE_SSM} --force --yes
-ssm install -d $DEST -u `pwd` -p ${BINAIRE_SSM}   --force --yes
-#ssm publish -d $DEST          -p ${BINAIRE_SSM}   --force --yes
+#ssm unpublish -d $DEST  -p ${BINAIRE_SSM} --force
+ssm uninstall -d $DEST  -p ${BINAIRE_SSM} --force
+ssm install -d $DEST -u `pwd` -p ${BINAIRE_SSM}   --force
+#ssm publish -d $DEST          -p ${BINAIRE_SSM}   --force
 
 # keep a copy in repository
 cp -rf  ${BINAIRE_SSM}.ssm $DEPOT
