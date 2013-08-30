@@ -15,7 +15,13 @@ mtype=`uname -s`
 case  $mtype  in
 IRIX64 ) export HOSTTYPE=irix65-mips-n32 ;;
 AIX    ) export HOSTTYPE=aix71-ppc7-64 ;;
-Linux  ) export HOSTTYPE=linux26-i386 ;;
+Linux  )
+    if [ "`uname -m`" = "x86_64" ]; then
+        export HOSTTYPE=linux26-x86-64
+    else
+        export HOSTTYPE=linux26-i386
+    fi
+    ;;
 esac
 
 # Make sure platform in control file is correct

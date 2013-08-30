@@ -22,7 +22,12 @@ then
    ranlib libburp_c.a
 elif [ "`uname`" = "Linux" ]
 then
-   OS="linux26-i386"
+   if [ "`uname -m`" = "x86_64" ]
+   then
+      OS="linux26-x86-64"
+   else
+      OS="linux26-i386"
+   fi
    ar scru libburp_c.a *.o 
    ranlib  libburp_c.a
 else
