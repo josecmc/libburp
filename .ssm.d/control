@@ -1,7 +1,7 @@
 Package: burplib-c
-Version: 1.5
+Version: 1.5.1
 Platform: linux26-x86-64
 Maintainer: afsdcvs
-BuildInfo: 15-05-2013
+BuildInfo: 04-03-2014
 Description: C/C++ Burp API
 
