@@ -1,6 +1,12 @@
 
 description:
 ----------------------------
+2014-03-04   Chris Malek <Christophe.Malek@ec.gc.ca>
+   *version-1.5.1
+   * update build system for latest SSM domain package naming (ie. _ubuntu-10.04-amd64-64)
+2013-06-19   Chris Malek <Christophe.Malek@ec.gc.ca>
+   *version-1.5
+   * Anthony's changes to add a new character based block (to store msc_id)
 2007-11-05   Hamid Benhocine <Hamid.Benhocine@ec.gc.ca>
    *version-1.3
    * simplifiaction du code de burp_api.c : on enleve
