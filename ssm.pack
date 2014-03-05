@@ -14,13 +14,15 @@ export VERNO=`grep Version ./.ssm.d/control | sed 's/Version://g' | sed 's/ *//g
 
 # Make sure platform in control file is correct
 cp ./.ssm.d/control temp
-sed "s/Platform:.*/Platform: $HOSTTYPE/g" temp > ./.ssm.d/control
+sed "s/Platform:.*/Platform: ${ORDENV_PLAT}/g" temp > ./.ssm.d/control
 rm -rf temp
 
 export BINAIRE_SSM="${PKG_NAME}_${VERNO}_${ORDENV_PLAT}"
 
 # compiler le package
 cd src
+./make.ksh
+cd ../exemples
 ./make.ksh
 
 cd ../..

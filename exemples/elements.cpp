@@ -14,6 +14,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <cstring>
 // pour utiliser la librairie burp
 #include "burp_api.h"
 using namespace std;
@@ -22,7 +23,11 @@ std::string ToString(int );
 bool parse_arguments ( int argc, char *argv[], int& idtyp , int& btyp, int& bfam,
                        std::string& burpin, bool &);
 
-int main ( int argc, char * argv[] )
+#ifdef Linux
+extern "C" int MAIN_ ( int argc, char * argv[] )
+#else
+extern "C" int main ( int argc, char * argv[] )
+#endif
 {
    BURP_BLK *bs, *br;
    BURP_RPT *rs, *rr;
@@ -145,15 +150,15 @@ int main ( int argc, char * argv[] )
    if (counters.empty()) return 0;
    set<int>::iterator pos;
    map<string,set<int> >::const_iterator imap;
-   for (imap = counters.begin(); imap !=counters.end();++imap)
-   {
+   //for (imap = counters.begin(); imap !=counters.end();++imap)
+   //{
 //      cout << imap->first << endl;
-      for (pos = (imap->second).begin(); pos !=(imap->second).end();++pos)
-      {
+      //for (pos = ((imap->second).begin()); pos !=(imap->second).end();++pos)
+      //{
 //         cout << *pos  << endl;
-      }
+      //}
 
-   }
+   //}
 
 
 //    // construire un vecteur des elements de type string
@@ -222,7 +227,7 @@ int main ( int argc, char * argv[] )
  
     // cout << endl << "Read data from file" << endl;
     typedef string::const_iterator is;
-    set<int>::iterator resultIter;
+    set<int>::const_iterator resultIter;
     string line;
     // chercher la premiere ligne, nous n;avons pas besoin
     getline (In, line);
@@ -238,7 +243,7 @@ int main ( int argc, char * argv[] )
          for (imap = counters.begin(); imap !=counters.end();++imap)
          {
 //            cout << imap->first << string(i,i+6) << " " << atoi((string(i,i+6)).c_str()) << endl;
-            resultIter = (imap->second).find( atoi((string(i,i+6)).c_str()));
+            resultIter = ((imap->second).find( atoi((string(i,i+6)).c_str())));
             if (resultIter != (imap->second).end()) 
                cout << imap->first << " --> " << line << endl; 
 

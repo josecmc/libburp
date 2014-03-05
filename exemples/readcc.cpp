@@ -11,12 +11,13 @@
 #include <map>
 #include <iostream>
 #include <iomanip>
+#include <cstdio>
 using namespace std;
 
 #ifdef  Linux
-  MAIN_( int argc, char **argv ) 
+extern "C" int MAIN_( int argc, char **argv ) 
 #else      /* ----- #ifdef Linux  ----- */
-int main ( int argc, char **argv ) 
+extern "C" int main ( int argc, char **argv ) 
 #endif     /* ----- #ifdef Linux  ----- */
 {
     BURP_BLK *bs, *br;

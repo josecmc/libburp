@@ -10,7 +10,12 @@ using namespace std;
 // et les mettre dans un vecteur. Puis faire une sortie vers le stout
 // des sttions trouvees.
 
-int main ( int argc, char *argv[] ) {
+#ifdef Linux
+extern "C" int MAIN_ ( int argc, char *argv[] )
+#else
+extern "C" int main ( int argc, char *argv[] )
+#endif
+{
     BURP_RPT *rs, *rr;
 
     // voir si qqchose en argument

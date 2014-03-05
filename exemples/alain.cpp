@@ -14,7 +14,11 @@
 #include "burp_api.h"
 using namespace std;
 
-int main ( int argc, char * argv[] )
+#ifdef Linux
+extern "C" int MAIN_ ( int argc, char * argv[] )
+#else
+extern "C" int main ( int argc, char * argv[] )
+#endif
 {
     BURP_BLK *bs, *br;
     BURP_RPT *rs, *rr, *rout;
