@@ -6,22 +6,29 @@ SCRIPT=`readlink -f $0`
 SCRIPT_PATH=`dirname $SCRIPT`
 cd $SCRIPT_PATH
 
-rm -rf  core *.o *.a *.so 
-
-. s.ssmuse.dot devtools legacy rmnlib-dev
+rm -rf core *.o *.a *.so 
 
 # load appropriate compilers for each architecture
-if [ "${ORDENV_PLAT}" = "aix-7.1-ppc7-64" ]; then
-    . s.ssmuse.dot Xlf13
-    archive_parameter="-X64"
-elif [ "${ORDENV_PLAT}" = "ubuntu-10.04-amd64-64" ]; then
-    . s.ssmuse.dot pgi9xx
-else
-   echo "Unsupported architecture: ${ORDENV_PLAT}"
-   exit 1
+if [[ -z ${COMP_ARCH} ]]; then
+    if [[ "${ORDENV_PLAT}" = "aix-7.1-ppc7-64" ]]; then
+        . s.ssmuse.dot devtools
+        . ssmuse-sh -d rpn/libs/4.0
+        . s.ssmuse.dot Xlf13
+    elif [[ "${ORDENV_PLAT}" = "ubuntu-10.04-amd64-64" || "${ORDENV_PLAT}" = "ubuntu-12.04-amd64-64" ]]; then
+        . s.ssmuse.dot devtools
+        . ssmuse-sh -d rpn/libs/4.0
+        . ssmuse-sh -d hpcs/201402/00/base -d hpcs/201402/00/intel13sp1
+    else
+       echo "Unsupported architecture: ${ORDENV_PLAT}"
+       exit 1
+    fi
 fi
 
-s.compile  -src burp_api.c  -O 3
+if [ "${ORDENV_PLAT}" = "aix-7.1-ppc7-64" ]; then
+    archive_parameter="-X64"
+fi
+
+s.compile -src burp_api.c  -O 3
 
 ls *.o
 
