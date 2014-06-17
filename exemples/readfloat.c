@@ -8,11 +8,14 @@
 /* pour utilser la librairie burp*/
 #include "burp_api.h"
 #define MIS_VAL   -99.99
-#ifdef  Linux
-  MAIN_( int argc, char **argv ) 
-#else      /* ----- #ifdef Linux  ----- */
-int main ( int argc, char **argv ) 
-#endif     /* ----- #ifdef Linux  ----- */
+
+#if __INTEL_COMPILER
+  int MAIN__(int argc, char **argv )
+#elif __GNUC__ 
+  int MAIN_( int argc, char **argv )
+#else
+  int main ( int argc, char **argv )
+#endif
 {
    int istat;
    int i,j,k;

@@ -23,10 +23,12 @@ std::string ToString(int );
 bool parse_arguments ( int argc, char *argv[], int& idtyp , int& btyp, int& bfam,
                        std::string& burpin, bool &);
 
-#ifdef Linux
-extern "C" int MAIN_ ( int argc, char * argv[] )
+#if __INTEL_COMPILER
+  extern "C" int MAIN__(int argc, char **argv )
+#elif __GNUC__ 
+  extern "C" int MAIN_( int argc, char **argv )
 #else
-extern "C" int main ( int argc, char * argv[] )
+  extern "C" int main ( int argc, char **argv )
 #endif
 {
    BURP_BLK *bs, *br;

@@ -11,7 +11,14 @@
 // pour utiliser la librairie burp
 #include "burp_api.h"
 using namespace std;
-int main ( int argc, char * argv[] ) 
+
+#if __INTEL_COMPILER
+  extern "C" int MAIN__(int argc, char **argv )
+#elif __GNUC__ 
+  extern "C" int MAIN_( int argc, char **argv )
+#else
+  extern "C" int main ( int argc, char **argv )
+#endif
 {
     BURP_RPT  *rr;
     BURP_BLK  *br, *br2,*tmp;

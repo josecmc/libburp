@@ -18,7 +18,13 @@ using namespace std;
 // convertit un entier en objet string 
 std::string ToString(int );
 
-int main ( int argc, char * argv[] )
+#if __INTEL_COMPILER
+  extern "C" int MAIN__(int argc, char **argv )
+#elif __GNUC__ 
+  extern "C" int MAIN_( int argc, char **argv )
+#else
+  extern "C" int main ( int argc, char **argv )
+#endif
 {
    bool debug = false;
    //creer un container de type map, dont la cle est la

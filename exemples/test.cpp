@@ -10,10 +10,12 @@ using namespace std;
 // et les mettre dans un vecteur. Puis faire une sortie vers le stout
 // des sttions trouvees.
 
-#ifdef Linux
-extern "C" int MAIN_ ( int argc, char *argv[] )
+#if __INTEL_COMPILER
+  extern "C" int MAIN__(int argc, char **argv )
+#elif __GNUC__ 
+  extern "C" int MAIN_( int argc, char **argv )
 #else
-extern "C" int main ( int argc, char *argv[] )
+  extern "C" int main ( int argc, char **argv )
 #endif
 {
     BURP_RPT *rs, *rr;

@@ -25,7 +25,7 @@ fi
 if [[ "${ORDENV_PLAT}" = "aix-7.1-ppc7-64" ]]; then
     platform_parameters="-libsys C"
 elif [[ "${ORDENV_PLAT}" = "ubuntu-10.04-amd64-64" || "${ORDENV_PLAT}" = "ubuntu-12.04-amd64-64" ]]; then
-    platform_parameters="-defines=-DLinux -libsys stdc++"
+    platform_parameters="-libsys stdc++"
 fi
 
 # alain.cpp: on AIX produces the obscure message: 1586-494 (U) INTERNAL COMPILER ERROR: Wcode stack is not empty at beginning of basic block.

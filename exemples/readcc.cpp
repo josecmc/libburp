@@ -14,11 +14,13 @@
 #include <cstdio>
 using namespace std;
 
-#ifdef  Linux
-extern "C" int MAIN_( int argc, char **argv ) 
-#else      /* ----- #ifdef Linux  ----- */
-extern "C" int main ( int argc, char **argv ) 
-#endif     /* ----- #ifdef Linux  ----- */
+#if __INTEL_COMPILER
+  extern "C" int MAIN__(int argc, char **argv )
+#elif __GNUC__ 
+  extern "C" int MAIN_( int argc, char **argv )
+#else
+  extern "C" int main ( int argc, char **argv )
+#endif
 {
     BURP_BLK *bs, *br;
     BURP_RPT *rs, *rr;
