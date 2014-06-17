@@ -25,7 +25,7 @@ bool parse_arguments ( int argc, char *argv[], int& idtyp , int& btyp, int& bfam
 
 #if __INTEL_COMPILER
   extern "C" int MAIN__(int argc, char **argv )
-#elif __GNUC__ 
+#elif __GNUC__ || __PGI
   extern "C" int MAIN_( int argc, char **argv )
 #else
   extern "C" int main ( int argc, char **argv )
