@@ -9,13 +9,7 @@
 #include "burp_api.h"
 #define MIS_VAL   -99.99
 
-#if __INTEL_COMPILER
-  int MAIN__(int argc, char **argv )
-#elif __GNUC__ || __PGI 
-  int MAIN_( int argc, char **argv )
-#else
-  int main ( int argc, char **argv )
-#endif
+int my_main ( int argc, char **argv )
 {
    int istat;
    int i,j,k;

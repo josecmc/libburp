@@ -9,14 +9,7 @@
 #include <stdio.h>
 //#include <rpnmacros.h>
 
-#if __INTEL_COMPILER
-  int MAIN__(int argc, char **argv )
-#elif __GNUC__ || __PGI 
-  int MAIN_( int argc, char **argv ) 
-#else
-  int main ( int argc, char **argv ) 
-#endif
-//int f77name(main)( int argc, char **argv )
+int my_main ( int argc, char **argv ) 
 {
     BURP_BLK *bs, *br;
     BURP_RPT *rs, *rr;

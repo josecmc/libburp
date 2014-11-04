@@ -10,13 +10,7 @@ using namespace std;
 // et les mettre dans un vecteur. Puis faire une sortie vers le stout
 // des sttions trouvees.
 
-#if __INTEL_COMPILER
-  extern "C" int MAIN__(int argc, char **argv )
-#elif __GNUC__  || __PGI
-  extern "C" int MAIN_( int argc, char **argv )
-#else
-  extern "C" int main ( int argc, char **argv )
-#endif
+extern "C" int my_main ( int argc, char **argv )
 {
     BURP_RPT *rs, *rr;
 

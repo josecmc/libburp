@@ -13,13 +13,7 @@
 #include "burp_api.h"
 using namespace std;
 
-#if __INTEL_COMPILER
-  extern "C" int MAIN__(int argc, char **argv )
-#elif __GNUC__ || __PGI 
-  extern "C" int MAIN_( int argc, char **argv )
-#else
-  extern "C" int main ( int argc, char **argv )
-#endif
+extern "C" int my_main ( int argc, char **argv )
 {
     BURP_BLK *bs, *br;
     BURP_RPT *rs, *rr;

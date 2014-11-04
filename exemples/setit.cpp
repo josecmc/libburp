@@ -14,17 +14,12 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <cstring> // for strcmp
 using namespace std;
 // convertit un entier en objet string 
 std::string ToString(int );
 
-#if __INTEL_COMPILER
-  extern "C" int MAIN__(int argc, char **argv )
-#elif __GNUC__ || __PGI
-  extern "C" int MAIN_( int argc, char **argv )
-#else
-  extern "C" int main ( int argc, char **argv )
-#endif
+extern "C" int my_main ( int argc, char **argv )
 {
    bool debug = false;
    //creer un container de type map, dont la cle est la
