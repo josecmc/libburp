@@ -25,7 +25,7 @@ elif [[ "${ORDENV_PLAT}" = "ubuntu-10.04-amd64-64" || "${ORDENV_PLAT}" = "ubuntu
     if [[ "${COMP_ARCH}" = "intel13sp1u2" ]]; then
         platform_parameters="-libsys stdc++"
     elif [[ "${COMP_ARCH}" = "pgi1401" ]]; then
-        platform_parameters="-libsys std C stdc++ -openmp"
+        platform_parameters="-libsys std C stdc++ numa"
     fi
 fi
 
