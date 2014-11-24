@@ -263,7 +263,13 @@ int brp_convertblk( BURP_BLK  *bb,int mode )
    int istat ;
 
    if (bb == NULL) return(-1);
-   if ( BLK_DATYP(bb) != 6 || BLK_DATYP(bb) != 7 ) {
+   // only do conversion if this isn't a marker block
+   // AND if it isn't a real or character block
+   // (see brp_readblk for their conversion conditions as well)
+   if ( (BLK_BKNAT(bb)%4) != 3 &&
+            BLK_DATYP(bb) != 6 && 
+            BLK_DATYP(bb) != 7 && 
+            BLK_DATYP(bb) != 3 ) {
      istat = c_mrbcvt( bb->lstele, bb->tblval,
                 bb->rval, BLK_NELE(bb),
                 BLK_NVAL(bb), BLK_NT(bb), mode );
@@ -814,6 +820,7 @@ BURP_RPT *brp_newrpt( void )
      BURP_RPT  *rpt;
 
      rpt = (BURP_RPT *) malloc( sizeof(BURP_RPT) );
+     if (rpt == NULL) fprintf(stderr, "ERROR: Out of memory!\n");
 
      rpt->buffer = NULL;
      rpt->nsize = 0;
