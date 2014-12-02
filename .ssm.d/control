@@ -1,4 +1,4 @@
-Package: burplib-c
+Package: libburp_c
 Version: 1.5.2
 Platform: ubuntu-10.04-amd64-64
 Maintainer: afsdcvs
