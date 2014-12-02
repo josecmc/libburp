@@ -1,4 +1,4 @@
-Package: libburp_c
+Package: libburpc
 Version: 1.5.2
 Platform: ubuntu-10.04-amd64-64
 Maintainer: afsdcvs
