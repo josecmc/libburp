@@ -14,6 +14,7 @@ if [[ -z ${COMP_ARCH} ]]; then
         . ssmuse-sh -d hpcs/201402/01/base -d hpcs/ext/xlf_13.1.0.10
     elif [[ "${ORDENV_PLAT}" = "ubuntu-10.04-amd64-64" || "${ORDENV_PLAT}" = "ubuntu-12.04-amd64-64" ]]; then
         . ssmuse-sh -d hpcs/201402/01/base -d hpcs/201402/01/intel13sp1u2
+        compiler_parameters="-optc =-fp-model =precise"
     else
        echo "Unsupported architecture: ${ORDENV_PLAT}"
        exit 1
@@ -28,7 +29,7 @@ if [ "${ORDENV_PLAT}" = "aix-7.1-ppc7-64" ]; then
     archive_parameter="-X64"
 fi
 
-s.compile -src burp_api.c -debug -O 3
+s.compile -src burp_api.c $compiler_parameters -debug -O 3
 
 ar $archive_parameter scru libburp_c.a *.o
 ranlib libburp_c.a
