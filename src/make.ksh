@@ -1,12 +1,12 @@
 #!/usr/bin/ksh
-set -ex
+set -e
 
 # make sure we are compiling locally
 SCRIPT=`readlink -f $0`
 SCRIPT_PATH=`dirname $SCRIPT`
 cd $SCRIPT_PATH
 
-rm -rf core *.o *.a *.so 
+rm -rf core *.o *.a *.so libburp_c.a 
 
 # load appropriate compilers for each architecture
 if [[ -z ${COMP_ARCH} ]]; then
@@ -20,15 +20,15 @@ if [[ -z ${COMP_ARCH} ]]; then
     fi
 fi
 # for rmnlib.h
-. ssmuse-sh -d rpn/libs/15.0
+. ssmuse-sh -d rpn/libs/15.2
+
+set -ex
 
 if [ "${ORDENV_PLAT}" = "aix-7.1-ppc7-64" ]; then
     archive_parameter="-X64"
 fi
 
 s.compile -src burp_api.c -debug -O 3
-
-ls *.o
 
 ar $archive_parameter scru libburp_c.a *.o
 ranlib libburp_c.a
