@@ -26,9 +26,10 @@ set -ex
 
 if [ "${ORDENV_PLAT}" = "aix-7.1-ppc7-64" ]; then
     archive_parameter="-X64"
+    compiler_parameters="-optf =-Wl,-brtl"
 elif [[ "${ORDENV_PLAT}" = "ubuntu-10.04-amd64-64" || "${ORDENV_PLAT}" = "ubuntu-12.04-amd64-64" ]]; then
     if [[ "${COMP_ARCH}" == "intel13sp1u2" ]]; then
-        compiler_parameters="-optc =-fp-model =precise =-Wl,-rpath=/ssm/net/rpn/libs/15.2/ubuntu-10.04-amd64-64/lib/Linux_x86-64/intel13sp1u2,-rpath=/ssm/net/hpcs/201402/01/intel13sp1u2/multi/lib/intel64"
+        compiler_parameters="-optc =-fp-model =precise -optf =-Wl,-rpath=/ssm/net/rpn/libs/15.2/ubuntu-10.04-amd64-64/lib/Linux_x86-64/intel13sp1u2,-rpath=/ssm/net/hpcs/201402/01/intel13sp1u2/multi/lib/intel64"
     fi
 fi
 
