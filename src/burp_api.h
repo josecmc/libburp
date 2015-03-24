@@ -300,6 +300,7 @@ extern  void       brp_resetblkhdr( BURP_BLK *blk );
  * converters
  */
 extern  int        brp_encodeblk( BURP_BLK  *blk );
+extern  int        brp_safe_convertblk( BURP_BLK  *blk, int mode );
 extern  int        brp_convertblk( BURP_BLK  *blk, int mode );
 /*
  * find report and block before reading them

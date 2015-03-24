@@ -244,6 +244,36 @@ void brp_clrrpt( BURP_RPT *rpt )
 }
 
 /*
+ *  module    :  BRP_SAFE_CONVERTBLK
+ *
+ *  author    :  Chris Malek
+ *
+ *  revision  : 
+ *
+ *  status    :
+ *
+ *  language  :  C
+ *
+ *  object    :  convert between floating point and integer value
+ *               of a block (and make sure output memory is initialized
+ *               before conversion to avoid junk from memory creeping in)
+ *
+ */
+int brp_safe_convertblk( BURP_BLK  *bb, int mode )
+{
+   if (mode == BUFR_to_MKSA)
+   {
+       memset(bb->rval, 0, BLK_NELE(bb)*BLK_NVAL(bb)*BLK_NT(bb)*sizeof(float));
+   }
+   else if (mode == MKSA_to_BUFR)
+   {
+       memset(bb->tblval, 0, BLK_NELE(bb)*BLK_NVAL(bb)*BLK_NT(bb)*sizeof(int));
+   }
+
+   brp_convertblk(bb, mode);
+}
+
+/*
  *  module    :  BRP_CONVERTBLK
  *
  *  author    :  Souvanlasy Viengsvanh
@@ -276,7 +306,6 @@ int brp_convertblk( BURP_BLK  *bb,int mode )
    }
    return ( istat );
 }
-
 
 /*
  *  module    :  BRP_ENCODEBLK
