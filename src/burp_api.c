@@ -270,13 +270,6 @@ int brp_convertblk( BURP_BLK  *bb,int mode )
             BLK_DATYP(bb) != 6 && 
             BLK_DATYP(bb) != 7 && 
             BLK_DATYP(bb) != 3 ) {
-     if ( mode == 0 ) {
-         memset(bb->rval, 0, BLK_NELE(bb)*BLK_NVAL(bb)*BLK_NT(bb)*sizeof(float));
-     } else if ( mode == 1 ) {
-         memset(bb->tblval, 0, BLK_NELE(bb)*BLK_NVAL(bb)*BLK_NT(bb)*sizeof(int));
-     } else {
-         return(-1);
-     }
      istat = c_mrbcvt( bb->lstele, bb->tblval,
                 bb->rval, BLK_NELE(bb),
                 BLK_NVAL(bb), BLK_NT(bb), mode );
@@ -596,7 +589,6 @@ int  brp_readblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt, int docvt)
 ** TBLVAL a RVAL si docvt et le blk n'est pas un marqueur
 */
                 if (docvt && (BLK_BKNAT(blk)%4) != 3) {
-                        memset(blk->rval, 0, BLK_NELE(blk)*BLK_NVAL(blk)*BLK_NT(blk)*sizeof(float)); 
                         c_mrbcvt( blk->lstele, blk->tblval,
                 blk->rval, BLK_NELE(blk),
                 BLK_NVAL(blk), BLK_NT(blk),
