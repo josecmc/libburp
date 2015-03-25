@@ -1,3 +1,4 @@
+
 /*
  *
  *  file      :  burp_api.c
@@ -261,6 +262,8 @@ void brp_clrrpt( BURP_RPT *rpt )
  */
 int brp_safe_convertblk( BURP_BLK  *bb, int mode )
 {
+   if (bb == NULL) return(-1);
+
    if (mode == BUFR_to_MKSA)
    {
        memset(bb->rval, 0, BLK_NELE(bb)*BLK_NVAL(bb)*BLK_NT(bb)*sizeof(float));
@@ -268,6 +271,10 @@ int brp_safe_convertblk( BURP_BLK  *bb, int mode )
    else if (mode == MKSA_to_BUFR)
    {
        memset(bb->tblval, 0, BLK_NELE(bb)*BLK_NVAL(bb)*BLK_NT(bb)*sizeof(int));
+   }
+   else
+   {
+       return(-1);
    }
 
    brp_convertblk(bb, mode);
@@ -485,6 +492,30 @@ void brp_freerpt( BURP_RPT *rpt )
    rpt->nsize = 0;
    free( rpt );
 }
+
+/*
+ *  module    :  BRP_SAFE_GETBLK
+ *
+ *  author    :  Chris Malek
+ *
+ *  revision  :
+ *
+ *  status    :
+ *
+ *  language  :  C
+ *
+ *  object    :  read a block from a report
+ *               and initialize memory of output block prior to conversion
+ */
+int  brp_safe_getblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt)
+{
+        int istat;
+        istat = (brp_readblk( bkno, blk, rpt, 0 ));
+        brp_safe_convertblk( blk, BUFR_to_MKSA );
+        BLK_SetSTORE_TYPE(blk, STORE_FLOAT );
+        return istat;
+}
+
 
 /*
  *  module    :  BRP_GETBLK
