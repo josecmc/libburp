@@ -311,6 +311,7 @@ extern  int        brp_findrpt( int iun, BURP_RPT *rpt );
  * read in data
  */
 extern  int        brp_getrpt( int iun, int handle, BURP_RPT  *rpt );
+extern  int        brp_safe_getblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt);
 extern  int        brp_getblk(int bkno, BURP_BLK  *blk, BURP_RPT  *rpt);
 
 /* brp_readblk same as brp_getblk() but the BLK_RVAL(blk,e,v,t) values
