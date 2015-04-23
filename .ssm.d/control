@@ -1,6 +1,2 @@
-Package: libburpc
-Version: 1.6
-Platform: ubuntu-12.04-amd64-64
-Maintainer: afsdssm
 Description: C Burp API
 
