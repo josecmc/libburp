@@ -299,6 +299,8 @@ int brp_safe_convertblk( BURP_BLK  *bb, int mode )
    }
 
    brp_convertblk(bb, mode);
+
+   return 0;
 }
 
 /*
@@ -1301,6 +1303,108 @@ void brp_resizeblk_v2( BURP_BLK **inblk,int nele, int nval, int nt)
     *inblk = dest;
     brp_freeblk(source);
 }
+
+/*
+ *  module    :  brp_resizeblk_v3
+ *
+ *  author    :  Anthony Chartier
+ *
+ *  revision  :
+ *
+ *  status    :
+ *
+ *  language  :  C
+ *
+ *  object    :  resize block to new diemsions
+ *               Version optimisee de brp_resizeblk:
+ *               - Meme signature que brp_resizeblk contrairement a brp_resizeblk_v2
+ *               - Ne pas copier le bloc prealablement.
+ *               - Deplacer seulement les elements qui sont dans le
+ *                 plus petit ensemble.
+ *               - Travailler avec un bloc vierge, on swap les pointeurs
+ *                 a la fin.
+ */
+void brp_resizeblk_v3(BURP_BLK *source, int nele, int nval, int nt) {
+    int e, v, t;
+    int min_ele, min_val, min_nt;
+    BURP_BLK * tmp;
+
+    if (source == NULL) {
+        fprintf(stderr, " blk pointer is NULL, resizeblk not done!\n");
+        return;
+    }
+    
+    tmp = brp_newblk();
+    brp_allocblk(tmp, nele, nval, nt);
+    BLK_SetBKNO( tmp, BLK_BKNO( source));
+    BLK_SetBFAM( tmp, BLK_BFAM( source));
+    BLK_SetBDESC(tmp, BLK_BDESC(source));
+    BLK_SetBTYP( tmp, BLK_BTYP( source));
+    BLK_SetBKNAT(tmp, BLK_BKNAT(source));
+    BLK_SetBKTYP(tmp, BLK_BKTYP(source));
+    BLK_SetBKSTP(tmp, BLK_BKSTP(source));
+    BLK_SetNBIT( tmp, BLK_NBIT( source));
+    tmp->bit0 = source->bit0;
+    BLK_SetDATYP(tmp, BLK_DATYP(source));
+    BLK_SetSTORE_TYPE(tmp, BLK_STORE_TYPE(source));
+    
+    min_ele = BLK_NELE(source) > BLK_NELE(tmp) ? BLK_NELE(tmp) : BLK_NELE(source);
+    min_val = BLK_NVAL(source) > BLK_NVAL(tmp) ? BLK_NVAL(tmp) : BLK_NVAL(source);
+    min_nt  = BLK_NT(source)   > BLK_NT(tmp)   ? BLK_NT(tmp)   : BLK_NT(source);
+    
+    for (e = 0; e != min_ele; e++) {
+        if (source->dlstele != NULL) BLK_SetDLSTELE(tmp, e, BLK_DLSTELE(source, e));
+        if (source->lstele != NULL)  BLK_SetLSTELE(tmp, e, BLK_LSTELE(source, e));
+    }
+    
+    for (e = 0; e != min_ele; e++) {
+        for (v = 0; v != min_val; v++) {
+            for (t = 0; t != min_nt; t++) {
+                if (source->tblval != NULL) 
+                    BLK_SetTBLVAL(tmp, e, v, t, BLK_TBLVAL(source, e, v, t));
+                if (source->rval   != NULL) 
+                    BLK_SetRVAL(tmp, e, v, t, BLK_RVAL(source, e, v, t));
+                if ((BLK_STORE_TYPE(source) == STORE_DOUBLE) && source->drval   != NULL) 
+                    BLK_SetDVAL(tmp, e, v, t, BLK_DVAL(source, e, v, t));
+                if ((BLK_STORE_TYPE(source) == STORE_CHAR )  && source->charval != NULL )
+                    BLK_SetCVAL(tmp,v,t,BLK_CVAL(source,v,t));
+            }
+        }
+    }
+    
+    BLK_SetNELE(source, nele);
+    BLK_SetNVAL(source, nval);
+    BLK_SetNT(  source, nt);
+    
+    void *swap_ptr;
+    swap_ptr = source->charval;
+    source->charval = tmp->charval;
+    tmp->charval = swap_ptr;
+    
+    swap_ptr = source->dlstele;
+    source->dlstele = tmp->dlstele;
+    tmp->dlstele = swap_ptr;
+    
+    swap_ptr = source->drval;
+    source->drval = tmp->drval;
+    tmp->drval = swap_ptr;
+
+    swap_ptr = source->lstele;
+    source->lstele = tmp->lstele;
+    tmp->lstele = swap_ptr;
+    
+    swap_ptr = source->rval;
+    source->rval = tmp->rval;
+    tmp->rval = swap_ptr;
+
+    swap_ptr = source->tblval;
+    source->tblval = tmp->tblval;
+    tmp->tblval = swap_ptr;
+    
+    brp_freeblk(tmp);
+}
+
+
 /*
  *  module    :  brp_delblk
  *

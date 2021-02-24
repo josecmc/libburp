@@ -374,8 +374,9 @@ extern void        brp_resizerpt( BURP_RPT * dest, int NewSize);
 /* duplicate block */
 extern void        brp_copyblk( BURP_BLK *dest, const BURP_BLK *source);
 /* resize  block */
-extern void        brp_resizeblk( BURP_BLK *source,int NEW_ele, int NEW_nval, int NEW_nt);
-extern void        brp_resizeblk_v2( BURP_BLK **source ,int nele, int nval, int nt);
+extern void        brp_resizeblk(    BURP_BLK  *source, int NEW_ele, int NEW_nval, int NEW_nt);
+extern void        brp_resizeblk_v2( BURP_BLK **source, int nele,    int nval,     int nt);
+extern void        brp_resizeblk_v3( BURP_BLK  *source, int NEW_ele, int NEW_nval, int NEW_nt);
 
 /*
  * Opening files
